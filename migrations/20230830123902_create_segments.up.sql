@@ -1,0 +1,4 @@
+CREATE TABLE segments (
+    seg_id BIGSERIAL PRIMARY KEY,
+    slug VARCHAR NOT NULL UNIQUE
+);

@@ -58,3 +58,19 @@ GET /seg - просмотр активных сегментов пользова
 ```bash
 curl "http://localhost:8080/hello"
 ```
+
+## Миграции БД
+
+```
+CREATE USER dev WITH PASSWORD 'qwerty';
+CREATE DATABASE user_seg_app_dev;
+
+migrate create -ext sql -dir migrations create_segments
+migrate create -ext sql -dir migrations create_users_with_segments
+
+migrate -path migrations -database "postgres://localhost/user_seg_app_dev?sslmode=disable&user=dev&password=qwerty" up
+
+\c user_seg_app_dev
+\d segments
+\d users_with_segments
+```
