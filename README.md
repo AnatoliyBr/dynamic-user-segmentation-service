@@ -73,4 +73,8 @@ migrate -path migrations -database "postgres://localhost/user_seg_app_dev?sslmod
 \c user_seg_app_dev
 \d segments
 \d users_with_segments
+
+CREATE DATABASE user_seg_app_test;
+
+migrate -path migrations -database "postgres://localhost/user_seg_app_test?sslmode=disable&user=dev&password=qwerty" up
 ```
