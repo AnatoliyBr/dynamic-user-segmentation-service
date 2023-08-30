@@ -5,7 +5,9 @@ import (
 	"log"
 
 	"github.com/AnatoliyBr/dynamic-user-segmentation-service/internal/controller/httpserver"
+	"github.com/AnatoliyBr/dynamic-user-segmentation-service/internal/repository"
 	"github.com/BurntSushi/toml"
+	"github.com/joho/godotenv"
 )
 
 var configPath string
@@ -16,10 +18,21 @@ func init() {
 
 func Run() {
 
+	// PostgreSQL
+	if err := godotenv.Load(); err != nil {
+		log.Fatal(err)
+	}
+	configDB := repository.NewConfig()
+	db, err := repository.NewDB(configDB)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
 	// Controller
 	flag.Parse()
 	configServer := httpserver.NewConfig()
-	_, err := toml.DecodeFile(configPath, configServer)
+	_, err = toml.DecodeFile(configPath, configServer)
 	if err != nil {
 		log.Fatal(err)
 	}
