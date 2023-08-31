@@ -53,10 +53,29 @@ GET /seg - просмотр активных сегментов пользова
 ## Запуск и отладка
 Все команды, используемые в процессе разработки и тестирования, фиксировались в `Makefile`.
 
-## Примеры curl-запросов
-
+## Примеры curl-запросов и ответов
+### Linux
 ```bash
 curl "http://localhost:8080/hello"
+{"test":"hello"}
+
+curl -X POST http://localhost:8080/seg -d "{"slug":"AVITO_DISCOUNT_30"}"
+{"seg_id":1,"slug":"AVITO_DISCOUNT_30"}
+
+curl -X DELETE http://localhost:8080/seg -d "{slug":"AVITO_DISCOUNT_30}"
+{"delete segment":"AVITO_DISCOUNT_30"}
+```
+
+### Windows
+```bash
+curl "http://localhost:8080/hello"
+{"test":"hello"}
+
+curl -X POST http://localhost:8080/seg -d "{\"slug\":\"AVITO_DISCOUNT_30\"}"
+{"seg_id":1,"slug":"AVITO_DISCOUNT_30"}
+
+curl -X DELETE http://localhost:8080/seg -d "{\"slug\":\"AVITO_DISCOUNT_30\"}"
+{"delete segment":"AVITO_DISCOUNT_30"}
 ```
 
 ## Миграции БД

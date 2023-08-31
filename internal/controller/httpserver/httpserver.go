@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/AnatoliyBr/dynamic-user-segmentation-service/internal/entity"
+	"github.com/AnatoliyBr/dynamic-user-segmentation-service/internal/usecase"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 )
@@ -12,13 +14,15 @@ type server struct {
 	config *Config
 	logger *logrus.Logger
 	router *mux.Router
+	uc     usecase.UseCase
 }
 
-func NewServer(config *Config) *server {
+func NewServer(config *Config, uc usecase.UseCase) *server {
 	s := &server{
 		config: config,
 		logger: logrus.New(),
 		router: mux.NewRouter(),
+		uc:     uc,
 	}
 
 	s.configureRouter()
@@ -29,8 +33,8 @@ func NewServer(config *Config) *server {
 func (s *server) configureRouter() {
 	s.router.HandleFunc("/hello", s.handleHello()).Methods(http.MethodGet)
 
-	//s.router.HandleFunc("/seg", s.handleSegmentsCreate()).Methods(http.MethodPost)
-	//s.router.HandleFunc("/seg", s.handleSegmentsDelete()).Methods(http.MethodDelete)
+	s.router.HandleFunc("/seg", s.handleSegmentsCreate()).Methods(http.MethodPost)
+	s.router.HandleFunc("/seg", s.handleSegmentsDelete()).Methods(http.MethodDelete)
 	//s.router.HandleFunc("/seg", s.handleSegmentsUpdateUser()).Methods(http.MethodPut)
 	//s.router.HandleFunc("/seg", s.handleSegmentsGetByUser()).Methods(http.MethodGet)
 }
@@ -61,6 +65,55 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (s *server) handleHello() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		s.respond(w, r, http.StatusOK, map[string]string{"test": "hello"})
+	}
+}
+
+func (s *server) handleSegmentsCreate() http.HandlerFunc {
+	type request struct {
+		Slug string `json:"slug"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := &request{}
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		seg := &entity.Segment{
+			Slug: req.Slug,
+		}
+
+		if err := s.uc.SegmentCreate(seg); err != nil {
+			s.error(w, r, http.StatusUnprocessableEntity, err)
+			return
+		}
+		s.respond(w, r, http.StatusCreated, seg)
+	}
+}
+
+func (s *server) handleSegmentsDelete() http.HandlerFunc {
+	type request struct {
+		Slug string `json:"slug"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := &request{}
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		seg, err := s.uc.SegmentFindBySlug(req.Slug)
+		if err != nil {
+			s.error(w, r, http.StatusNotFound, err)
+			return
+		}
+
+		if err := s.uc.SegmentDelete(seg); err != nil {
+			s.error(w, r, http.StatusInternalServerError, err)
+		}
+		s.respond(w, r, http.StatusOK, map[string]string{"delete segment": seg.Slug})
 	}
 }
 

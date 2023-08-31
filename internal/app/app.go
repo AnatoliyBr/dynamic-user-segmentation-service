@@ -6,6 +6,8 @@ import (
 
 	"github.com/AnatoliyBr/dynamic-user-segmentation-service/internal/controller/httpserver"
 	"github.com/AnatoliyBr/dynamic-user-segmentation-service/internal/repository"
+	"github.com/AnatoliyBr/dynamic-user-segmentation-service/internal/repository/sqlrepository"
+	"github.com/AnatoliyBr/dynamic-user-segmentation-service/internal/usecase"
 	"github.com/BurntSushi/toml"
 	"github.com/joho/godotenv"
 )
@@ -29,6 +31,12 @@ func Run() {
 	}
 	defer db.Close()
 
+	// Repository
+	r := sqlrepository.NewSegmentRepository(db)
+
+	// UseCase
+	uc := usecase.NewAppUseCase(r)
+
 	// Controller
 	flag.Parse()
 	configServer := httpserver.NewConfig()
@@ -37,7 +45,7 @@ func Run() {
 		log.Fatal(err)
 	}
 
-	s := httpserver.NewServer(configServer)
+	s := httpserver.NewServer(configServer, uc)
 	if err := s.StartServer(); err != nil {
 		log.Fatal(err)
 	}
