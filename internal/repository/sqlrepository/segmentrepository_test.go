@@ -37,13 +37,27 @@ func TestSegmentRepository_FindBySlug(t *testing.T) {
 
 func TestSegmentRepository_Delete(t *testing.T) {
 	db, teardown := sqlrepository.TestDB(t, testDatabaseURL)
-	defer teardown("segments")
+	defer teardown("users_with_segments", "segments")
 
 	r := sqlrepository.NewSegmentRepository(db)
-	seg := &entity.Segment{Slug: "AVITO_DISCOUNT_30"}
-	r.Create(seg)
-	err := r.Delete(seg)
+
+	userID := 1
+	segList := []*entity.Segment{
+		{Slug: "AVITO_DISCOUNT_30"},
+		{Slug: "AVITO_DISCOUNT_50"},
+	}
+
+	r.Create(segList[0])
+	r.Create(segList[1])
+
+	r.AddUserToSegments(userID, segList)
+
+	err := r.Delete(segList[0])
 	assert.NoError(t, err)
+
+	r.Delete(segList[1])
+	_, err = r.FindByUser(userID)
+	assert.EqualError(t, err, repository.ErrRecordNotFound.Error())
 }
 
 func TestSegmentRepository_AddUserToSegments(t *testing.T) {

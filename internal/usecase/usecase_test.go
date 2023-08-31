@@ -1,4 +1,4 @@
-package testrepository_test
+package usecase_test
 
 import (
 	"testing"
@@ -6,30 +6,34 @@ import (
 	"github.com/AnatoliyBr/dynamic-user-segmentation-service/internal/entity"
 	"github.com/AnatoliyBr/dynamic-user-segmentation-service/internal/repository"
 	"github.com/AnatoliyBr/dynamic-user-segmentation-service/internal/repository/testrepository"
+	"github.com/AnatoliyBr/dynamic-user-segmentation-service/internal/usecase"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSegmentRepository_Create(t *testing.T) {
+func TestAppUseCase_SegmentCreate(t *testing.T) {
 	r := testrepository.NewSegmentRepository()
+	uc := usecase.NewAppUseCase(r)
 	seg := &entity.Segment{Slug: "AVITO_DISCOUNT_30"}
 
-	assert.NoError(t, r.Create(seg))
+	assert.NoError(t, uc.SegmentCreate(seg))
 }
 
-func TestSegmentRepository_FindBySlug(t *testing.T) {
+func TestAppUseCase_SegmentFindBySlug(t *testing.T) {
 	r := testrepository.NewSegmentRepository()
+	uc := usecase.NewAppUseCase(r)
 	seg1 := &entity.Segment{Slug: "AVITO_DISCOUNT_30"}
-	_, err := r.FindBySlug(seg1.Slug)
+	_, err := uc.SegmentFindBySlug(seg1.Slug)
 	assert.EqualError(t, err, repository.ErrRecordNotFound.Error())
 
-	r.Create(seg1)
-	seg2, err := r.FindBySlug(seg1.Slug)
+	uc.SegmentCreate(seg1)
+	seg2, err := uc.SegmentFindBySlug(seg1.Slug)
 	assert.NoError(t, err)
 	assert.NotNil(t, seg2)
 }
 
-func TestSegmentRepository_Delete(t *testing.T) {
+func TestAppUseCase_SegmentDelete(t *testing.T) {
 	r := testrepository.NewSegmentRepository()
+	uc := usecase.NewAppUseCase(r)
 
 	userID := 1
 	segList := []*entity.Segment{
@@ -38,23 +42,20 @@ func TestSegmentRepository_Delete(t *testing.T) {
 		{Slug: "AVITO_VOICE_MESSAGES"},
 	}
 
-	r.Create(segList[0])
-	r.Create(segList[1])
-	r.AddUserToSegments(userID, segList[0:2])
+	uc.SegmentCreate(segList[0])
+	uc.SegmentCreate(segList[1])
+	uc.AddUserToSegments(userID, segList[0:2])
 
-	err := r.Delete(segList[0])
+	err := uc.SegmentDelete(segList[0])
 	assert.NoError(t, err)
 
-	err = r.Delete(segList[2])
-	assert.EqualError(t, err, repository.ErrRecordNotFound.Error())
-
-	r.Delete(segList[1])
-	_, err = r.FindByUser(userID)
+	err = uc.SegmentDelete(segList[2])
 	assert.EqualError(t, err, repository.ErrRecordNotFound.Error())
 }
 
-func TestSegmentRepository_AddUserToSegments(t *testing.T) {
+func TestAppUseCase_AddUserToSegments(t *testing.T) {
 	r := testrepository.NewSegmentRepository()
+	uc := usecase.NewAppUseCase(r)
 
 	userID := 1
 	segList := []*entity.Segment{
@@ -62,18 +63,19 @@ func TestSegmentRepository_AddUserToSegments(t *testing.T) {
 		{Slug: "AVITO_DISCOUNT_50"},
 	}
 
-	err := r.AddUserToSegments(userID, segList)
+	err := uc.AddUserToSegments(userID, segList)
 	assert.EqualError(t, err, repository.ErrRecordNotFound.Error())
 
-	r.Create(segList[0])
-	r.Create(segList[1])
+	uc.SegmentCreate(segList[0])
+	uc.SegmentCreate(segList[1])
 
-	err = r.AddUserToSegments(userID, segList)
+	err = uc.AddUserToSegments(userID, segList)
 	assert.NoError(t, err)
 }
 
-func TestSegmentRepository_DeleteUserFromSegments(t *testing.T) {
+func TestAppUseCase_DeleteUserFromSegments(t *testing.T) {
 	r := testrepository.NewSegmentRepository()
+	uc := usecase.NewAppUseCase(r)
 
 	userID := 1
 	segList := []*entity.Segment{
@@ -81,16 +83,17 @@ func TestSegmentRepository_DeleteUserFromSegments(t *testing.T) {
 		{Slug: "AVITO_DISCOUNT_50"},
 	}
 
-	r.Create(segList[0])
-	r.Create(segList[1])
-	r.AddUserToSegments(userID, segList)
+	uc.SegmentCreate(segList[0])
+	uc.SegmentCreate(segList[1])
+	uc.AddUserToSegments(userID, segList)
 
-	err := r.DeleteUserFromSegments(userID, segList)
+	err := uc.DeleteUserFromSegments(userID, segList)
 	assert.NoError(t, err)
 }
 
-func TestSegmentRepository_FindByUser(t *testing.T) {
+func TestAppUseCase_SegmentFindByUser(t *testing.T) {
 	r := testrepository.NewSegmentRepository()
+	uc := usecase.NewAppUseCase(r)
 
 	userID := 1
 	segList1 := []*entity.Segment{
@@ -98,14 +101,14 @@ func TestSegmentRepository_FindByUser(t *testing.T) {
 		{Slug: "AVITO_DISCOUNT_50"},
 	}
 
-	r.Create(segList1[0])
-	r.Create(segList1[1])
+	uc.SegmentCreate(segList1[0])
+	uc.SegmentCreate(segList1[1])
 
-	_, err := r.FindByUser(userID)
+	_, err := uc.SegmentFindByUser(userID)
 	assert.EqualError(t, err, repository.ErrRecordNotFound.Error())
 
-	r.AddUserToSegments(userID, segList1)
-	segList2, err := r.FindByUser(userID)
+	uc.AddUserToSegments(userID, segList1)
+	segList2, err := uc.SegmentFindByUser(userID)
 	assert.NoError(t, err)
 	assert.NotNil(t, segList2)
 }
