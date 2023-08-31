@@ -3,6 +3,7 @@ package httpserver
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/AnatoliyBr/dynamic-user-segmentation-service/internal/entity"
 	"github.com/AnatoliyBr/dynamic-user-segmentation-service/internal/usecase"
@@ -35,8 +36,8 @@ func (s *server) configureRouter() {
 
 	s.router.HandleFunc("/seg", s.handleSegmentsCreate()).Methods(http.MethodPost)
 	s.router.HandleFunc("/seg", s.handleSegmentsDelete()).Methods(http.MethodDelete)
-	//s.router.HandleFunc("/seg", s.handleSegmentsUpdateUser()).Methods(http.MethodPut)
-	//s.router.HandleFunc("/seg", s.handleSegmentsGetByUser()).Methods(http.MethodGet)
+	s.router.HandleFunc("/seg", s.handleSegmentsUpdateUser()).Methods(http.MethodPut)
+	s.router.HandleFunc("/seg", s.handleSegmentsGetByUser()).Methods(http.MethodGet)
 }
 
 func (s *server) configureLogger() error {
@@ -114,6 +115,79 @@ func (s *server) handleSegmentsDelete() http.HandlerFunc {
 			s.error(w, r, http.StatusInternalServerError, err)
 		}
 		s.respond(w, r, http.StatusOK, map[string]string{"delete segment": seg.Slug})
+	}
+}
+
+func (s *server) handleSegmentsUpdateUser() http.HandlerFunc {
+	type request struct {
+		SlugListAdd []string `json:"slug_list_add"`
+		SlugListDel []string `json:"slug_list_del"`
+		UserID      int      `json:"user_id"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := &request{}
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		segListAdd := make([]*entity.Segment, 0)
+		segListDel := make([]*entity.Segment, 0)
+
+		for _, slug := range req.SlugListAdd {
+			seg, err := s.uc.SegmentFindBySlug(slug)
+			if err != nil {
+				s.error(w, r, http.StatusNotFound, err)
+				return
+			}
+			segListAdd = append(segListAdd, seg)
+		}
+
+		for _, slug := range req.SlugListDel {
+			seg, err := s.uc.SegmentFindBySlug(slug)
+			if err != nil {
+				s.error(w, r, http.StatusNotFound, err)
+				return
+			}
+			segListDel = append(segListDel, seg)
+		}
+
+		if err := s.uc.DeleteUserFromSegments(req.UserID, segListDel); err != nil {
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		if err := s.uc.AddUserToSegments(req.UserID, segListAdd); err != nil {
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, map[string][]string{
+			"add segments":    req.SlugListAdd,
+			"delete segments": req.SlugListDel,
+			"user_id":         {strconv.Itoa(req.UserID)}})
+	}
+}
+
+func (s *server) handleSegmentsGetByUser() http.HandlerFunc {
+	type request struct {
+		UserID int `json:"user_id"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := &request{}
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		segList, err := s.uc.SegmentFindByUser(req.UserID)
+		if err != nil {
+			s.error(w, r, http.StatusNotFound, err)
+			return
+		}
+		s.respond(w, r, http.StatusOK, segList)
 	}
 }
 

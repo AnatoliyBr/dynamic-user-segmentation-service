@@ -62,9 +62,47 @@ curl "http://localhost:8080/hello"
 curl -X POST http://localhost:8080/seg -d "{"slug":"AVITO_DISCOUNT_30"}"
 {"seg_id":1,"slug":"AVITO_DISCOUNT_30"}
 
-curl -X DELETE http://localhost:8080/seg -d "{slug":"AVITO_DISCOUNT_30}"
+curl -X DELETE http://localhost:8080/seg -d "{"slug":"AVITO_DISCOUNT_30"}"
 {"delete segment":"AVITO_DISCOUNT_30"}
+
+curl -X PUT http://localhost:8080/seg -d "{"slug_list_add":["AVITO_DISCOUNT_30"], "slug_list_del":[], "user_id": 1}"
+{"add segments":["AVITO_DISCOUNT_30"],"delete segments":[],"user_id":["1"]}
+
+curl -X GET http://localhost:8080/seg -d "{"user_id": 1}"
+[{"seg_id":1,"slug":"AVITO_DISCOUNT_30"}]
+
+curl -X PUT http://localhost:8080/seg -d "{"slug_list_add":[], "slug_list_del":["AVITO_DISCOUNT_30"], "user_id": 1}"
+{"add segments":[],"delete segments":["AVITO_DISCOUNT_30"],"user_id":["1"]}
 ```
+
+<details>
+    <summary> Более сложный пример</summary>
+
+```bash
+curl -X POST http://localhost:8080/seg -d "{"slug":"AVITO_DISCOUNT_30"}"
+{"seg_id":1,"slug":"AVITO_DISCOUNT_30"}
+
+curl -X POST http://localhost:8080/seg -d "{"slug":"AVITO_DISCOUNT_40"}"
+{"seg_id":2,"slug":"AVITO_DISCOUNT_40"}
+
+curl -X POST http://localhost:8080/seg -d "{"slug":"AVITO_DISCOUNT_50"}"
+{"seg_id":3,"slug":"AVITO_DISCOUNT_50"}
+
+curl -X POST http://localhost:8080/seg -d "{"slug":"AVITO_DISCOUNT_60"}"
+{"seg_id":4,"slug":"AVITO_DISCOUNT_60"}
+
+curl -X PUT http://localhost:8080/seg -d "{"slug_list_add":["AVITO_DISCOUNT_30", "AVITO_DISCOUNT_40", "AVITO_DISCOUNT_50", "AVITO_DISCOUNT_60"], "slug_list_del":[], "user_id": 1}"
+{"add segments":["AVITO_DISCOUNT_30","AVITO_DISCOUNT_40","AVITO_DISCOUNT_50","AVITO_DISCOUNT_60"],"delete segments":[],"user_id":["1"]}
+
+curl -X POST http://localhost:8080/seg -d "{"slug":"TEST"}"
+{"seg_id":30,"slug":"TEST"}
+
+// Одновременное добавление и удаление сегментов
+
+curl -X PUT http://localhost:8080/seg -d "{"slug_list_add":["TEST"], "slug_list_del":["AVITO_DISCOUNT_30", "AVITO_DISCOUNT_40", "AVITO_DISCOUNT_50", "AVITO_DISCOUNT_60"], "user_id": 1}"
+{"add segments":["TEST"],"delete segments":["AVITO_DISCOUNT_30","AVITO_DISCOUNT_40","AVITO_DISCOUNT_50","AVITO_DISCOUNT_60"],"user_id":["1"]}
+```
+</details>
 
 ### Windows
 ```bash
@@ -76,7 +114,45 @@ curl -X POST http://localhost:8080/seg -d "{\"slug\":\"AVITO_DISCOUNT_30\"}"
 
 curl -X DELETE http://localhost:8080/seg -d "{\"slug\":\"AVITO_DISCOUNT_30\"}"
 {"delete segment":"AVITO_DISCOUNT_30"}
+
+curl -X PUT http://localhost:8080/seg -d "{\"slug_list_add\":[\"AVITO_DISCOUNT_30\"], \"slug_list_del\":[], \"user_id\": 1}"
+{"add segments":["AVITO_DISCOUNT_30"],"delete segments":[],"user_id":["1"]}
+
+curl -X GET http://localhost:8080/seg -d "{\"user_id\": 1}"
+[{"seg_id":1,"slug":"AVITO_DISCOUNT_30"}]
+
+curl -X PUT http://localhost:8080/seg -d "{\"slug_list_add\":[], \"slug_list_del\":[\"AVITO_DISCOUNT_30\"], \"user_id\": 1}"
+{"add segments":[],"delete segments":["AVITO_DISCOUNT_30"],"user_id":["1"]}
 ```
+
+<details>
+    <summary> Более сложный пример</summary>
+
+```bash
+curl -X POST http://localhost:8080/seg -d "{\"slug\":\"AVITO_DISCOUNT_30\"}"
+{"seg_id":1,"slug":"AVITO_DISCOUNT_30"}
+
+curl -X POST http://localhost:8080/seg -d "{\"slug\":\"AVITO_DISCOUNT_40\"}"
+{"seg_id":2,"slug":"AVITO_DISCOUNT_40"}
+
+curl -X POST http://localhost:8080/seg -d "{\"slug\":\"AVITO_DISCOUNT_50\"}"
+{"seg_id":3,"slug":"AVITO_DISCOUNT_50"}
+
+curl -X POST http://localhost:8080/seg -d "{\"slug\":\"AVITO_DISCOUNT_60\"}"
+{"seg_id":4,"slug":"AVITO_DISCOUNT_60"}
+
+curl -X PUT http://localhost:8080/seg -d "{\"slug_list_add\":[\"AVITO_DISCOUNT_30\", \"AVITO_DISCOUNT_40\", \"AVITO_DISCOUNT_50\", \"AVITO_DISCOUNT_60\"], \"slug_list_del\":[], \"user_id\": 1}"
+{"add segments":["AVITO_DISCOUNT_30","AVITO_DISCOUNT_40","AVITO_DISCOUNT_50","AVITO_DISCOUNT_60"],"delete segments":[],"user_id":["1"]}
+
+curl -X POST http://localhost:8080/seg -d "{\"slug\":\"TEST\"}"
+{"seg_id":30,"slug":"TEST"}
+
+// Одновременное добавление и удаление сегментов
+
+curl -X PUT http://localhost:8080/seg -d "{\"slug_list_add\":[\"TEST\"], \"slug_list_del\":[\"AVITO_DISCOUNT_30\", \"AVITO_DISCOUNT_40\", \"AVITO_DISCOUNT_50\", \"AVITO_DISCOUNT_60\"], \"user_id\": 1}"
+{"add segments":["TEST"],"delete segments":["AVITO_DISCOUNT_30","AVITO_DISCOUNT_40","AVITO_DISCOUNT_50","AVITO_DISCOUNT_60"],"user_id":["1"]}
+```
+</details>
 
 ## Миграции БД
 
