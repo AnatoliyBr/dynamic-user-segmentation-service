@@ -9,8 +9,10 @@ type Config struct {
 func NewConfig() *Config {
 	databaseURL := os.Getenv("DATABASE_URL")
 	if databaseURL == "" {
-		databaseURL = "host=localhost user=dev password=qwerty dbname=user_seg_app_test sslmode=disable"
+		databaseURL = "postgres://dev:qwerty@localhost:5432/user_seg_app_dev"
 	}
+
+	databaseURL += "?sslmode=disable"
 
 	return &Config{
 		DatabaseURL: databaseURL,
