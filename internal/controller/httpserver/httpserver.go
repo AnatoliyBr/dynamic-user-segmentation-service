@@ -3,7 +3,6 @@ package httpserver
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"github.com/AnatoliyBr/dynamic-user-segmentation-service/internal/entity"
 	"github.com/AnatoliyBr/dynamic-user-segmentation-service/internal/usecase"
@@ -163,10 +162,10 @@ func (s *server) handleSegmentsUpdateUser() http.HandlerFunc {
 			return
 		}
 
-		s.respond(w, r, http.StatusOK, map[string][]string{
+		s.respond(w, r, http.StatusOK, map[string]interface{}{
 			"add segments":    req.SlugListAdd,
 			"delete segments": req.SlugListDel,
-			"user_id":         {strconv.Itoa(req.UserID)}})
+			"user_id":         req.UserID})
 	}
 }
 
@@ -198,6 +197,8 @@ func (s *server) error(w http.ResponseWriter, r *http.Request, code int, err err
 func (s *server) respond(w http.ResponseWriter, r *http.Request, code int, data interface{}) {
 	w.WriteHeader(code)
 	if data != nil {
-		json.NewEncoder(w).Encode(data)
+		enc := json.NewEncoder(w)
+		enc.SetIndent("", "    ")
+		enc.Encode(data)
 	}
 }

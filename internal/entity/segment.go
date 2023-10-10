@@ -21,7 +21,7 @@ func (s *Segment) Validate() error {
 		validation.Field(
 			&s.Slug,
 			validation.Required,
-			validation.Match(regexp.MustCompile(`\w`)),
+			validation.Match(regexp.MustCompile(`^[\w]+$`)),
 			validation.Length(0, 50),
 		),
 	)

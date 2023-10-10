@@ -60,7 +60,7 @@ make compose-build
 make compose-up
 ```
 
-## Примеры запросов (Linux)
+## Примеры запросов
 * [Создание сегмента](#создание-сегмента)
 * [Удаление сегмента](#удаление-сегмента)
 * [Добавление/удаление пользователя в сегмент](#добавлениеудаление-пользователя-в-сегмент)
@@ -70,110 +70,99 @@ make compose-up
 Создание нового сегмента:
 
 ```bash
-curl -X POST http://localhost:8080/seg -d "{"slug":"AVITO_DISCOUNT_30"}"
+curl --location --request POST http://localhost:8080/seg \
+--data-raw '{
+    "slug": "AVITO_DISCOUNT_30"
+}'
 ```
 
 Пример ответа:
 
 ```bash
-{"seg_id":1,"slug":"AVITO_DISCOUNT_30"}
+{
+    "seg_id": 1,
+    "slug": "AVITO_DISCOUNT_30"
+}
 ```
 
 ### Удаление сегмента
 Удаление сегмента:
 
 ```bash
-curl -X DELETE http://localhost:8080/seg -d "{"slug":"AVITO_DISCOUNT_30"}"
+curl --location --request DELETE http://localhost:8080/seg \
+--data-raw '{
+    "slug": "AVITO_DISCOUNT_30"
+}'
 ```
 
 Пример ответа:
 
 ```bash
-{"delete segment":"AVITO_DISCOUNT_30"}
+{
+    "delete segment": "AVITO_DISCOUNT_30"
+}
 ```
 
 ### Добавление/удаление пользователя в сегмент
 Добавление/удаление пользователя в сегмент:
 
 ```bash
-curl -X PUT http://localhost:8080/seg -d "{"slug_list_add":["AVITO_VOICE_MESSAGES", "AVITO_PERFORMANCE_VAS"], "slug_list_del":["AVITO_DISCOUNT_30", "AVITO_DISCOUNT_40", "AVITO_DISCOUNT_50", "AVITO_DISCOUNT_60"], "user_id": 1}"
+curl --location --request PUT http://localhost:8080/seg \
+--data-raw '{
+    "slug_list_add": [
+        "AVITO_VOICE_MESSAGES",
+        "AVITO_PERFORMANCE_VAS"
+        ],
+    "slug_list_del": [
+        "AVITO_DISCOUNT_30",
+        "AVITO_DISCOUNT_40",
+        "AVITO_DISCOUNT_50",
+        "AVITO_DISCOUNT_60"], 
+    "user_id": 1
+}'
 ```
 
 Пример ответа:
 
 ```bash
-{"add segments":["AVITO_VOICE_MESSAGES","AVITO_PERFORMANCE_VAS"],"delete segments":["AVITO_DISCOUNT_30","AVITO_DISCOUNT_40","AVITO_DISCOUNT_50","AVITO_DISCOUNT_60"],"user_id":["1"]}
+{
+    "add segments": [
+        "AVITO_VOICE_MESSAGES",
+        "AVITO_PERFORMANCE_VAS"
+    ],
+    "delete segments": [
+        "AVITO_DISCOUNT_30",
+        "AVITO_DISCOUNT_40",
+        "AVITO_DISCOUNT_50",
+        "AVITO_DISCOUNT_60"
+    ],
+    "user_id": 1
+}
 ```
 
 ### Просмотр активных сегментов пользователя
 Просмотр активных сегментов пользователя:
 
 ```bash
-curl -X GET http://localhost:8080/seg -d "{"user_id": 1}"
+curl --location --request GET http://localhost:8080/seg \
+--data-raw '{
+    "user_id": 1
+}'
 ```
 
 Пример ответа:
 
 ```bash
-[{"seg_id":1,"slug":"AVITO_DISCOUNT_30"},{"seg_id":2,"slug":"AVITO_DISCOUNT_40"},{"seg_id":3,"slug":"AVITO_DISCOUNT_50"},{"seg_id":4,"slug":"AVITO_DISCOUNT_60"}]
-```
-
-## Примеры запросов (Windows)
-* [Создание сегмента](#создание)
-* [Удаление сегмента](#удаление)
-* [Добавление/удаление пользователя в сегмент](#добавлениеудаление-пользователя)
-* [Просмотр активных сегментов пользователя](#просмотр-активных-сегментов)
-
-### Создание
-Создание нового сегмента:
-
-```bash
-curl -X POST http://localhost:8080/seg -d "{\"slug\":\"AVITO_DISCOUNT_30\"}"
-```
-
-Пример ответа:
-
-```bash
-{"seg_id":1,"slug":"AVITO_DISCOUNT_30"}
-```
-
-### Удаление
-Удаление сегмента:
-
-```bash
-curl -X DELETE http://localhost:8080/seg -d "{\"slug\":\"AVITO_DISCOUNT_30\"}"
-```
-
-Пример ответа:
-
-```bash
-{"delete segment":"AVITO_DISCOUNT_30"}
-```
-
-### Добавление/удаление пользователя
-Добавление/удаление пользователя в сегмент:
-
-```bash
-curl -X PUT http://localhost:8080/seg -d "{\"slug_list_add\":[\"AVITO_VOICE_MESSAGES\", \"AVITO_PERFORMANCE_VAS\"], \"slug_list_del\":[\"AVITO_DISCOUNT_30\", \"AVITO_DISCOUNT_40\", \"AVITO_DISCOUNT_50\", \"AVITO_DISCOUNT_60\"], \"user_id\": 1}"
-```
-
-Пример ответа:
-
-```bash
-{"add segments":["AVITO_VOICE_MESSAGES","AVITO_PERFORMANCE_VAS"],"delete segments":["AVITO_DISCOUNT_30","AVITO_DISCOUNT_40","AVITO_DISCOUNT_50","AVITO_DISCOUNT_60"],"user_id":["1"]}
-```
-
-### Просмотр активных сегментов
-Просмотр активных сегментов пользователя:
-
-```bash
-curl -X GET http://localhost:8080/seg -d "{\"user_id\": 1}"
-```
-
-Пример ответа:
-
-```bash
-[{"seg_id":1,"slug":"AVITO_DISCOUNT_30"},{"seg_id":2,"slug":"AVITO_DISCOUNT_40"},{"seg_id":3,"slug":"AVITO_DISCOUNT_50"},{"seg_id":4,"slug":"AVITO_DISCOUNT_60"}]
+[
+    {
+        "seg_id": 5,
+        "slug": "AVITO_VOICE_MESSAGES"
+    },
+    {
+        "seg_id": 6,
+        "slug": "AVITO_PERFORMANCE_VAS"
+    }
+]
 ```
 
 ## Миграции БД

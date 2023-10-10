@@ -14,28 +14,23 @@ func TestSegment_Validate(t *testing.T) {
 		isValid bool
 	}{
 		{
-			name:    "uppercase",
+			name:    "valid",
 			slug:    "AVITO_DISCOUNT_30",
 			isValid: true,
 		},
 		{
-			name:    "lowercase",
-			slug:    "avito_discount_30",
+			name:    "mixedcase with whitespace",
+			slug:    "avito_DISCOUNT  30 ",
 			isValid: true,
 		},
 		{
-			name:    "mixedcase",
-			slug:    "avito_DISCOUNT_30",
-			isValid: true,
-		},
-		{
-			name:    "with whitespace",
-			slug:    "AVITO    DISCOUNT 30 ",
-			isValid: true,
+			name:    "empty",
+			slug:    "",
+			isValid: false,
 		},
 		{
 			name:    "invalid symbols",
-			slug:    "?#@*&%!",
+			slug:    "AVITO ?#@*&%!",
 			isValid: false,
 		},
 		{
